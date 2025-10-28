@@ -9,9 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Views\" />
-    <Folder Include="ViewModel\" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="ViewModel\**" />
+    <Compile Remove="Views\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="ViewModel\**" />
+    <EmbeddedResource Remove="Views\**" />
+    <None Remove="Models\**" />
+    <None Remove="ViewModel\**" />
+    <None Remove="Views\**" />
+    <Page Remove="Models\**" />
+    <Page Remove="ViewModel\**" />
+    <Page Remove="Views\**" />
   </ItemGroup>
 
 </Project>
