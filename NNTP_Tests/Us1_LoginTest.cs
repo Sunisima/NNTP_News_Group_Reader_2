@@ -8,7 +8,7 @@ namespace NNTP_Tests
         public void LoginWithCredentials_ReturnsOk()
         {
             // Arrange
-            var client = new Client();
+            var client = new NntpClient();
 
             // Act
             string actual = client.Login("news.sunsite.dk", 119, "loulee01@easv365.dk", "47b31a");

@@ -10,17 +10,13 @@
 
   <ItemGroup>
     <Compile Remove="Models\**" />
-    <Compile Remove="ViewModel\**" />
-    <Compile Remove="Views\**" />
     <EmbeddedResource Remove="Models\**" />
-    <EmbeddedResource Remove="ViewModel\**" />
-    <EmbeddedResource Remove="Views\**" />
     <None Remove="Models\**" />
-    <None Remove="ViewModel\**" />
-    <None Remove="Views\**" />
     <Page Remove="Models\**" />
-    <Page Remove="ViewModel\**" />
-    <Page Remove="Views\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
   </ItemGroup>
 
 </Project>
