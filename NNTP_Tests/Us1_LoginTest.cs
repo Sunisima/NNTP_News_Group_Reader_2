@@ -1,7 +1,4 @@
-﻿using System.Net.Sockets;
-using static NNTP_News_Group_Reader_2.Client;
-using Xunit;
-using NNTP_News_Group_Reader_2;
+﻿using NNTP_News_Group_Reader_2.Services;
 
 namespace NNTP_Tests
 {
