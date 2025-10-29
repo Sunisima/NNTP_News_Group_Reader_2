@@ -1,6 +1,7 @@
-﻿using System.Windows;
+﻿using NNTP_News_Group_Reader_2.ViewModel;
+using System.Windows;
 
-namespace NNTP_News_Group_Reader_2
+namespace NNTP_News_Group_Reader_2.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -9,7 +10,8 @@ namespace NNTP_News_Group_Reader_2
     {
         public MainWindow()
         {
-            
+            InitializeComponent();
+            DataContext = new MainWindowViewModel();
         }
     }
 }

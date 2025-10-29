@@ -1,58 +1,66 @@
-﻿<Window x:Class="NNTP_News_Group_Reader_2.Views"
+﻿<Window x:Class="NNTP_News_Group_Reader_2.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NNTP_News_Group_Reader_2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    
+        Title="MainWindow" Height="550" Width="800">
+
     <DockPanel>
-    <!-- Menu øverst -->
-    <Menu DockPanel.Dock="Top">
-        <MenuItem Header="_File">
-            <MenuItem Header="Exit" />
-        </MenuItem>
-        <MenuItem Header="_Setup" />
-    </Menu>
+        <!-- Menu øverst -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="Exit" />
+            </MenuItem>
+            <MenuItem Header="_Setup" />
+        </Menu>
 
-    <!-- Hovedindhold -->
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <!-- Venstre panel -->
-            <ColumnDefinition Width="*"/>
-            <!-- Midterpanel -->
-        </Grid.ColumnDefinitions>
+        <!-- Hovedindhold -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <!-- Venstre panel -->
+                <ColumnDefinition Width="*"/>
+                <!-- Midterpanel -->
+            </Grid.ColumnDefinitions>
 
-        <!-- Venstre: Nyhedsgrupper -->
-        <StackPanel Grid.Column="0" Margin="5">
-            <TextBlock Text="News Groups:" 
+            <!-- Venstre: Nyhedsgrupper -->
+            <StackPanel Grid.Column="0" Margin="5">
+                <TextBlock Text="News Groups:" 
                            FontWeight="Bold" 
                            Margin="0,0,0,5"/>
-            <ListBox x:Name="GroupList"
+                <ListBox x:Name="GroupList"
                          Height="300"
                          Width="180"
                          HorizontalAlignment="Left"/>
-            <Button Content="Connect to server"
-                    x:Name="connectToServer"
-                        Margin="0,10,0,0"
-                        Width="180"
-                        HorizontalAlignment="Left"/>
-                <Label Content=""
-                       x:Name="StatusLabel"/>
+                <Label Content="Enter Mail Address" HorizontalAlignment="Center"/>
+                <TextBox TextWrapping="Wrap" Text="{Binding User.UserName, Mode=TwoWay}"  Width="150" HorizontalAlignment="Center"/>
+                <Label Content="Enter Password" HorizontalAlignment="Center"/>
+                <TextBox TextWrapping="Wrap" Text="{Binding User.Password, Mode=TwoWay}" Width="150" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                <Button Content="Connect to server"
+                    Command="{Binding ConnectCommand}"
+                        Width="180" Margin="0,0,0,10"/>
+                <TextBlock Text="{Binding ConnectionStatus}"
+                    Margin="0,5,0,0"
+                    HorizontalAlignment="Center"
+                    FontWeight="Bold"
+                    Foreground="DarkSlateGray"
+                    TextWrapping="Wrap"
+                    TextAlignment="Center"
+                    Width="180"/>
             </StackPanel>
 
-        <!-- Midte: Artikler -->
-        <StackPanel Grid.Column="1" Margin="10">
-            <TextBlock Text="Articles:" 
+            <!-- Midte: Artikler -->
+            <StackPanel Grid.Column="1" Margin="10">
+                <TextBlock Text="Articles:" 
                            FontWeight="Bold" 
                            Margin="0,0,0,5"/>
-            <ListBox x:Name="ArticleList"
+                <ListBox x:Name="ArticleList"
                          Height="350"
                          HorizontalAlignment="Stretch"/>
-        </StackPanel>
-    </Grid>
+            </StackPanel>
+        </Grid>
 
     </DockPanel>
 </Window>
