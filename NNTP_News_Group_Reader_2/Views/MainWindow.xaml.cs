@@ -9,7 +9,7 @@ namespace NNTP_News_Group_Reader_2
     {
         public MainWindow()
         {
-            InitializeComponent();
+            
         }
     }
 }

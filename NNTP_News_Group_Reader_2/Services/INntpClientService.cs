@@ -2,6 +2,7 @@
 {
     /// <summary>
     /// Defines the basic operations required for communicating with an NNTP-server.
+    /// Loose coupling from our Services.
     /// </summary>
     public interface INntpClientService
     {

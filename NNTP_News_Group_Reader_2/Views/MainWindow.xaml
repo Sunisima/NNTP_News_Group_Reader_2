@@ -35,10 +35,13 @@
                          Width="180"
                          HorizontalAlignment="Left"/>
             <Button Content="Connect to server"
+                    x:Name="connectToServer"
                         Margin="0,10,0,0"
                         Width="180"
                         HorizontalAlignment="Left"/>
-        </StackPanel>
+                <Label Content=""
+                       x:Name="StatusLabel"/>
+            </StackPanel>
 
         <!-- Midte: Artikler -->
         <StackPanel Grid.Column="1" Margin="10">
