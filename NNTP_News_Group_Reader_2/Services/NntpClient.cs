@@ -1,10 +1,7 @@
 ﻿using NNTP_News_Group_Reader_2.Model;
-using System.Collections.Specialized;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 
 namespace NNTP_News_Group_Reader_2.Services
 {
@@ -110,6 +107,11 @@ namespace NNTP_News_Group_Reader_2.Services
         }
 
 
+        /// <summary>
+        /// Parsing raw data from the server to NewsGroups objects
+        /// </summary>
+        /// <param name="rawDataLines"></param>
+        /// <returns></returns>
         public List<NewsGroups> ParseNewsGroupsToObjects(List<string> rawDataLines)
         {
             var newsGroupsResult = new List<NewsGroups>();
@@ -123,7 +125,6 @@ namespace NNTP_News_Group_Reader_2.Services
                     newsGroupsResult.Add(new NewsGroups
                     {
                         NewsGroupName = parting[0],
-                        // Her bytter vi rækkefølgen
                         LastArticleId = int.TryParse(parting[1], out var high) ? high : 0,
                         FirstArticleId = int.TryParse(parting[2], out var low) ? low : 0,
                         flagStatus = parting[3][0]
@@ -131,6 +132,62 @@ namespace NNTP_News_Group_Reader_2.Services
                 }
             }
             return newsGroupsResult;
+        }
+
+
+        /// <summary>
+        /// Fetches and parses all article headlines for a specific news group from the NNTP server.
+        /// Sends NNTP commands:
+        /// 1) GROUP <selectedGroup> – to select the group and get its article range
+        /// 2) XOVER <low>-<high> – to retrieve overview data for all articles in that range
+        /// The response is parsed line by line, split by tab characters, and 
+        /// converted into a list of ArticleHeadlines objects.
+        /// </summary>
+        /// <param name="selectedGroup">The name of the news group selected by the user.</param>
+        /// <returns>A list of ArticleHeadlines containing the article ID and title.</returns>
+        public async Task<List<ArticleHeadlines>> FetchArticleHeadlines(string selectedGroup)
+        {
+            var headlines = new List<ArticleHeadlines>();
+
+            //Get selected group
+            string selectedGroupCommand = $"GROUP {selectedGroup}\r\n";
+            byte[] groupQuery = Encoding.ASCII.GetBytes(selectedGroupCommand);
+            await _stream.WriteAsync(groupQuery, 0, groupQuery.Length);
+            string? groupResponse = await _streamReader.ReadLineAsync();
+
+            // 2) Parse lowest og highest article number from  the result
+            var groupParts = groupResponse?.Split(' ');
+            if (groupParts == null || groupParts.Length < 5)
+                throw new Exception("Error, No articles found.");
+            //Takes the first and last articleNo from the result. It is used to show all articles in the group
+            string lowestArticleNo = groupParts[2];
+            string highestArticleNo = groupParts[3];
+
+            // 3) Gets all articles with the range of above chosen numbers
+            string xoverCommand = $"XOVER {lowestArticleNo}-{highestArticleNo}\r\n";
+            await _stream.WriteAsync(Encoding.ASCII.GetBytes(xoverCommand));
+
+            // 4) Read all headlines until it reaches "."
+            while (true)
+            {
+                string? line = await _streamReader.ReadLineAsync();
+                if (line == null || line == ".")
+                    break;
+
+                // 5) Split lines on each tab = one article
+                var parts = line.Split('\t');
+                if (parts.Length > 1)
+                {
+                    var headline = new ArticleHeadlines
+                    {
+                        ArticleId = int.Parse(parts[0]),
+                        HeadlineTitle = MimeDecoder.Decode(parts[1])
+                    };
+                    headlines.Add(headline);
+                }
+            }
+
+            return headlines;
         }
     }
 }

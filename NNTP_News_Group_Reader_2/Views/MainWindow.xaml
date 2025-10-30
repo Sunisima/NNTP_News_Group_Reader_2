@@ -4,8 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NNTP_News_Group_Reader_2"
+        xmlns:conv="clr-namespace:NNTP_News_Group_Reader_2.Converter"
         mc:Ignorable="d"
         Title="MainWindow" Height="550" Width="800">
+
+    <Window.Resources>
+        <conv:VisibilityOnConverter x:Key="VisibilityOnConverter"/>
+        <conv:VisibilityOffConv x:Key="VisibilityOffConv"/>
+    </Window.Resources>
 
     <DockPanel>
         <!-- Menu øverst -->
@@ -29,18 +35,23 @@
             <StackPanel Grid.Column="0" Margin="5">
                 <TextBlock Text="News Groups:" 
                            FontWeight="Bold" 
-                           Margin="0,0,0,5"/>
-                <ListBox x:Name="GroupList"
-                         Height="300"
-                         Width="180"
-                         HorizontalAlignment="Left"/>
-                <Label Content="Enter Mail Address" HorizontalAlignment="Center"/>
-                <TextBox TextWrapping="Wrap" Text="{Binding User.UserName, Mode=TwoWay}"  Width="150" HorizontalAlignment="Center"/>
-                <Label Content="Enter Password" HorizontalAlignment="Center"/>
-                <TextBox TextWrapping="Wrap" Text="{Binding User.Password, Mode=TwoWay}" Width="150" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                           Margin="0,0,0,5"
+                           Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOnConverter}}"/>
+                <ListBox ItemsSource="{Binding NewsGroups}"
+                           x:Name="NewsGroupList"
+                           DisplayMemberPath="NewsGroupName"
+                           Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOnConverter}}"
+                           SelectionChanged="GetArticlesFromSelectedGroup"
+                           Height="300"
+                           Width="180"
+                           HorizontalAlignment="Left"/>
+                <Label Content="Enter Mail Address" HorizontalAlignment="Center" Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOffConv}}"/>
+                <TextBox TextWrapping="Wrap" Text="{Binding User.UserName, Mode=TwoWay}"  Width="150" HorizontalAlignment="Center" Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOffConv}}"/>
+                <Label Content="Enter Password" HorizontalAlignment="Center" Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOffConv}}"/>
+                <TextBox TextWrapping="Wrap" Text="{Binding User.Password, Mode=TwoWay}" Width="150" Margin="0,0,0,10" HorizontalAlignment="Center" Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOffConv}}"/>
                 <Button Content="Connect to server"
                     Command="{Binding ConnectCommand}"
-                        Width="180" Margin="0,0,0,10"/>
+                        Width="180" Margin="0,0,0,10" Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOffConv}}"/>
                 <TextBlock Text="{Binding ConnectionStatus}"
                     Margin="0,5,0,0"
                     HorizontalAlignment="Center"
@@ -49,16 +60,22 @@
                     TextWrapping="Wrap"
                     TextAlignment="Center"
                     Width="180"/>
+                <Button Content="Load All News Groups" 
+                        Command="{Binding LoadNewsGroupsCommand}"
+                        Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOnConverter}}"
+                        Width="180" Margin="0,5,0,0"/>
             </StackPanel>
 
             <!-- Midte: Artikler -->
             <StackPanel Grid.Column="1" Margin="10">
                 <TextBlock Text="Articles:" 
                            FontWeight="Bold" 
-                           Margin="0,0,0,5"/>
+                           Margin="0,0,0,5"
+                           Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOnConverter}}"/>
                 <ListBox x:Name="ArticleList"
                          Height="350"
-                         HorizontalAlignment="Stretch"/>
+                         HorizontalAlignment="Stretch"
+                         Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOnConverter}}"/>
             </StackPanel>
         </Grid>
 

@@ -50,26 +50,59 @@ namespace NNTP_Spikes
             Console.WriteLine(passResponse);
 
 
-            // Spike 2: Check if LIST gets and shows news groups
-            
+            Console.WriteLine();
+
+
+            // Spike 2: Check if LIST gets and shows all available news groups. The command returns all group names and their metadata
+
             // 1) Send LIST command to server
             string listCommand = "LIST \r\n";
             byte[] listToByte = Encoding.ASCII.GetBytes(listCommand);
             ns.Write(listToByte, 0, listToByte.Length);
+            ns.Flush();
 
-            // 2) Read response from server
-            string responseList = reader.ReadLine();
-            Console.WriteLine(responseList);
+            Console.WriteLine(reader.ReadLine()); // 215 ...
 
-            // 3) Read and output first 10 news groups in console
-            for (int newsGroups = 0; newsGroups < 10; newsGroups++)
+            // Read ALL lines until "."
+            string? listAllLines;
+            while ((listAllLines = reader.ReadLine()) != null)
             {
-                string? newsGroupLine = reader.ReadLine();
-                if (newsGroupLine == null || newsGroupLine == ".")
-                    break;
+                if (listAllLines == ".") break;
+                Console.WriteLine(listAllLines);
+            }           
 
-                Console.WriteLine(newsGroupLine);
+            Console.WriteLine();
+
+
+
+            // Spike 3: Check if XOVER gets headlines for a specific news group
+
+            // 1) Chose a group to test out
+            string selectedGroup = "dk.fritid.bil";
+            string groupCommand = $"GROUP {selectedGroup}\r\n";
+            byte[] groupQuery = Encoding.ASCII.GetBytes(groupCommand);
+            ns.Write(groupQuery, 0, groupQuery.Length);
+            ns.Flush();
+
+            string? groupResponse = reader.ReadLine();
+            Console.WriteLine("Server response: " + groupResponse);
+
+            // 2) Server gives overview of article headlines
+            string xoverCommand = "XOVER 773650-773660\r\n";
+            byte[] xoverQuery = Encoding.ASCII.GetBytes(xoverCommand);
+            ns.Write(xoverQuery, 0, xoverQuery.Length);
+            ns.Flush();
+
+            Console.WriteLine("Sent XOVER command for dk.fritid.bil\n");
+
+            // Read headlines from articles
+            string? xoverHeadLLine;
+            while ((xoverHeadLLine = reader.ReadLine()) != null)
+            {
+                if (xoverHeadLLine == ".") break;
+                Console.WriteLine(xoverHeadLLine);
             }
+
         }
     }
 }

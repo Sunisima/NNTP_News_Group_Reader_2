@@ -2,25 +2,26 @@
 using GalaSoft.MvvmLight.CommandWpf;
 using NNTP_News_Group_Reader_2.Model;
 using NNTP_News_Group_Reader_2.Services;
+using System.Collections.ObjectModel;
 
 namespace NNTP_News_Group_Reader_2.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly INntpClientService _nntpClient;
+        private readonly BindingToNntpClientService _bindingNntpService;
         private string _connectionStatus;
-      
+        private bool _isConnected;
 
         public User User { get; set; }
+        // Binds UI-element directly to methods in the ViewModel-layer
         public RelayCommand ConnectCommand { get; set; }
+        public RelayCommand LoadNewsGroupsCommand { get; set; }
 
-
-        /// <summary>
-        /// Gets or sets the current connection status message displayed in the UI.
-        /// Notifies the View when the value changes.
-        /// </summary>
+        // Gets or sets the current connection status message displayed in the UI.
         public string ConnectionStatus
         {
+
             get { return _connectionStatus; }
             set
             {
@@ -29,6 +30,20 @@ namespace NNTP_News_Group_Reader_2.ViewModel
             }
         }
 
+        // Checks whether the user is connected to the server or not
+        public bool IsConnected
+        {
+            get => _isConnected;
+            set
+            {
+                _isConnected = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        // Holds the collection of news groups displayed in the UI.
+        public ObservableCollection<NewsGroups> NewsGroups { get; set; } = new();
+
 
         /// <summary>
         /// Initializes the MainWindowViewModel by creating instances of the NNTP client and user model.
@@ -36,9 +51,14 @@ namespace NNTP_News_Group_Reader_2.ViewModel
         public MainWindowViewModel()
         {
             _nntpClient = new NntpClient();
+            _bindingNntpService = new BindingToNntpClientService(_nntpClient);
+            
             User = new User();
+
             ConnectCommand = new RelayCommand(ConnectToServer);
-        }
+            //Binds UI to method ind ViewModel
+            LoadNewsGroupsCommand = new RelayCommand(async () => await LoadNewsGroups());
+        }        
 
 
         /// <summary>
@@ -59,7 +79,8 @@ namespace NNTP_News_Group_Reader_2.ViewModel
                 // Response from server
                 if (response.StartsWith("281"))
                 {
-                    ConnectionStatus = "Connection Successfull";
+                    ConnectionStatus = "Connection Successful";
+                    IsConnected = true;
 
                     // Save credentials
                     var storeLogin = new StoreCredentials
@@ -75,6 +96,7 @@ namespace NNTP_News_Group_Reader_2.ViewModel
                 else
                 {
                     ConnectionStatus = "Connection failed - Try again";
+                    IsConnected = false;
                 }
             }
             catch (Exception ex)
@@ -83,5 +105,40 @@ namespace NNTP_News_Group_Reader_2.ViewModel
                 ConnectionStatus = "Connection error: " + ex.Message;
             }
         }
+
+
+        /// <summary>
+        /// Loads all available news groups from the NNTP server and updates the observable collection in the UI.
+        /// </summary>
+        public async Task LoadNewsGroups()
+        {
+            try
+            {
+                ConnectionStatus = "Fetching news groups...";
+
+                var groups = await _bindingNntpService.GetAllNewsGroupsAsync();
+
+                NewsGroups.Clear();
+
+                foreach (var group in groups)
+                {
+                    NewsGroups.Add(group);
+                }
+
+                ConnectionStatus = "Loaded successfully";
+            }
+            catch (Exception ex)
+            {
+                ConnectionStatus = "Error loading groups: " + ex.Message;
+            }
+        }
+
+        public async Task<List<ArticleHeadlines>> GetArticlesForSelectedGroup(string groupName)
+        {
+            // Brug eksisterende forbindelse, som allerede er logget ind
+            return await _nntpClient.FetchArticleHeadlines(groupName);
+        }
+
+
     }
 }
