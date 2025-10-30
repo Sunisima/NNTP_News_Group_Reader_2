@@ -1,6 +1,10 @@
-﻿using System.IO;
+﻿using NNTP_News_Group_Reader_2.Model;
+using System.Collections.Specialized;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Windows.Media.Animation;
+using System.Windows.Shapes;
 
 namespace NNTP_News_Group_Reader_2.Services
 {
@@ -77,6 +81,56 @@ namespace NNTP_News_Group_Reader_2.Services
             _streamReader.Close();
             _stream.Close();
             _client.Close();
+        }
+
+
+        /// <summary>
+        /// Sends the command LIST to the server to get all news groups and return them in a string.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<string>> ListCommandToServerAsync()
+        {
+            var result = new List<string>();
+
+            byte[] listToByte = Encoding.ASCII.GetBytes("LIST \r\n");
+            await _stream.WriteAsync(listToByte, 0, listToByte.Length);
+
+            string? response = await _streamReader.ReadLineAsync();
+            if (response == null || !response.StartsWith("215"))
+                return result;
+
+            string? readAllLines; // Until it reaches "."
+            while ((readAllLines = await _streamReader.ReadLineAsync()) !=null)
+            {
+                if (readAllLines == ".")
+                    break;
+                result.Add(readAllLines);
+            }
+            return result;  
+        }
+
+
+        public List<NewsGroups> ParseNewsGroupsToObjects(List<string> rawDataLines)
+        {
+            var newsGroupsResult = new List<NewsGroups>();
+
+            foreach (var line in rawDataLines)
+            {
+                var parting = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                if (parting.Length >= 4 && !parting[0].StartsWith("215"))
+                {
+                    newsGroupsResult.Add(new NewsGroups
+                    {
+                        NewsGroupName = parting[0],
+                        // Her bytter vi rækkefølgen
+                        LastArticleId = int.TryParse(parting[1], out var high) ? high : 0,
+                        FirstArticleId = int.TryParse(parting[2], out var low) ? low : 0,
+                        flagStatus = parting[3][0]
+                    });
+                }
+            }
+            return newsGroupsResult;
         }
     }
 }
