@@ -75,6 +75,7 @@
                 <ListBox x:Name="ArticleList"
                          Height="350"
                          HorizontalAlignment="Stretch"
+                         SelectionChanged="GetSelectedArticleBody"
                          Visibility="{Binding IsConnected, Converter={StaticResource VisibilityOnConverter}}"/>
             </StackPanel>
         </Grid>

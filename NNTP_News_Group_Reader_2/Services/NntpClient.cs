@@ -200,7 +200,7 @@ namespace NNTP_News_Group_Reader_2.Services
         /// <returns></returns>
         public async Task<string> GetFullArticleBody(int articleId)
         {
-            string bodyCommand = $"BODY{articleId}\r\n";
+            string bodyCommand = $"BODY {articleId}\r\n";
             await _stream.WriteAsync(Encoding.ASCII.GetBytes(bodyCommand));
 
             // Building all the lines from the raw data to a full article to be shown in the UI

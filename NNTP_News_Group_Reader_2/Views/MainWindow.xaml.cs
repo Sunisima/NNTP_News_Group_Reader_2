@@ -42,11 +42,10 @@ namespace NNTP_News_Group_Reader_2.Views
             }
         }
 
+
         /// <summary>
-        /// Gets the full body of the article from ViewModel and shows the text in the UI
+        /// Opens a new window showing the full article text when a headline is clicked.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private async void GetSelectedArticleBody(object sender, SelectionChangedEventArgs e)
         {
             if (ArticleList.SelectedItem is ArticleHeadlines selectedHeadline)
@@ -54,14 +53,21 @@ namespace NNTP_News_Group_Reader_2.Views
                 try
                 {
                     var articleBody = await _viewModel.GetArticleBody(selectedHeadline.ArticleId);
-                    ArticleContent.Text = articleBody;
+
+                    // Create and show the new article window
+                    var articleWindow = new ArticleWindow(articleBody);
+                    articleWindow.Owner = this; // So it stays on top of main window
+                    articleWindow.ShowDialog();
+
+                    // Clear selection to avoid re-triggering
+                    ArticleList.SelectedItem = null;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Could not fetch article body.\nError: {ex.Message}");
+                    MessageBox.Show($"Could not fetch article body.\nError: {ex.Message}",
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
-
     }
 }
