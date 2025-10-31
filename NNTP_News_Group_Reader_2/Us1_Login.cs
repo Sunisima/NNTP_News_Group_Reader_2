@@ -1,8 +1,4 @@
-﻿using System.IO;
-using System.Net.Sockets;
-using System.Text;
-
-namespace NNTP_News_Group_Reader_2
+﻿namespace NNTP_News_Group_Reader_2
 {
     public class Us1_Login
     {
