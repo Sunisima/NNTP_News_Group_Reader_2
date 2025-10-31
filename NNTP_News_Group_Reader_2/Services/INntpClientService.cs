@@ -15,5 +15,6 @@ namespace NNTP_News_Group_Reader_2.Services
         Task<List<string>> ListCommandToServerAsync();
         public List<NewsGroups> ParseNewsGroupsToObjects(List<string> rawDataLines);
         Task<List<ArticleHeadlines>> FetchArticleHeadlines(string selectedGroup);
+        Task<string> GetFullArticleBody(int articleId);
     }
 }

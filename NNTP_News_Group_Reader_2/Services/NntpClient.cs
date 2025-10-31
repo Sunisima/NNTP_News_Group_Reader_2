@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Windows.Shapes;
 
 namespace NNTP_News_Group_Reader_2.Services
 {
@@ -155,7 +156,7 @@ namespace NNTP_News_Group_Reader_2.Services
             await _stream.WriteAsync(groupQuery, 0, groupQuery.Length);
             string? groupResponse = await _streamReader.ReadLineAsync();
 
-            // 2) Parse lowest og highest article number from  the result
+            // 2) Parse lowest og highest article number from the result
             var groupParts = groupResponse?.Split(' ');
             if (groupParts == null || groupParts.Length < 5)
                 throw new Exception("Error, No articles found.");
@@ -188,6 +189,33 @@ namespace NNTP_News_Group_Reader_2.Services
             }
 
             return headlines;
+        }
+
+
+        /// <summary>
+        /// Fetches all raw data from the full article and saves it in stringbuilder
+        /// Uses the command BODY to get alle data from the article
+        /// </summary>
+        /// <param name="articleId"></param>
+        /// <returns></returns>
+        public async Task<string> GetFullArticleBody(int articleId)
+        {
+            string bodyCommand = $"BODY{articleId}\r\n";
+            await _stream.WriteAsync(Encoding.ASCII.GetBytes(bodyCommand));
+
+            // Building all the lines from the raw data to a full article to be shown in the UI
+            var stringbuilder = new StringBuilder();
+            string? readline;
+
+            // Read all lines until "."
+            while ((readline = await _streamReader.ReadLineAsync()) != null)
+            {
+                if (readline == ".")
+                    break;
+                stringbuilder.AppendLine(readline);
+            }
+
+            return stringbuilder.ToString();
         }
     }
 }

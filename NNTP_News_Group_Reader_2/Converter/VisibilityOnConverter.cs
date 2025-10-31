@@ -19,7 +19,7 @@ namespace NNTP_News_Group_Reader_2.Converter
         /// otherwise returns Visibility.Collapsed to hide the element. </returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(value is bool isConnected)
+            if (value is bool isConnected)
                 return isConnected ? Visibility.Visible : Visibility.Collapsed;
 
             return Visibility.Collapsed;

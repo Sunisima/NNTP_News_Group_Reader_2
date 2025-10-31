@@ -41,5 +41,27 @@ namespace NNTP_News_Group_Reader_2.Views
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the full body of the article from ViewModel and shows the text in the UI
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void GetSelectedArticleBody(object sender, SelectionChangedEventArgs e)
+        {
+            if (ArticleList.SelectedItem is ArticleHeadlines selectedHeadline)
+            {
+                try
+                {
+                    var articleBody = await _viewModel.GetArticleBody(selectedHeadline.ArticleId);
+                    ArticleContent.Text = articleBody;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Could not fetch article body.\nError: {ex.Message}");
+                }
+            }
+        }
+
     }
 }

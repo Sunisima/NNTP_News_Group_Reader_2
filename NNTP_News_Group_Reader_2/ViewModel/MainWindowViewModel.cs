@@ -30,6 +30,7 @@ namespace NNTP_News_Group_Reader_2.ViewModel
             }
         }
 
+
         // Checks whether the user is connected to the server or not
         public bool IsConnected
         {
@@ -40,6 +41,7 @@ namespace NNTP_News_Group_Reader_2.ViewModel
                 RaisePropertyChanged();
             }
         }
+
 
         // Holds the collection of news groups displayed in the UI.
         public ObservableCollection<NewsGroups> NewsGroups { get; set; } = new();
@@ -133,12 +135,25 @@ namespace NNTP_News_Group_Reader_2.ViewModel
             }
         }
 
+
+        /// <summary>
+        /// Gets all article headlines for the selected news group by calling the NNTP client service.
+        /// </summary>
+
         public async Task<List<ArticleHeadlines>> GetArticlesForSelectedGroup(string groupName)
         {
-            // Brug eksisterende forbindelse, som allerede er logget ind
             return await _nntpClient.FetchArticleHeadlines(groupName);
         }
 
+
+        /// <summary>
+        /// Gets the full text of a specific article by calling the NNTP client service.
+        /// Used by the UI when a headline is selected.
+        /// </summary>
+        public async Task<string> GetArticleBody(int articleId)
+        {
+            return await _nntpClient.GetFullArticleBody(articleId);
+        }
 
     }
 }
